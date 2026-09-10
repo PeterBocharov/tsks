@@ -1,0 +1,32 @@
+{% extends "er_tasks/base.html" %}
+{% block title %}Custom{% endblock %}
+{% block content %}
+<div class="cards">
+  <div class="card"><div class="n">{{ custom.tp_count }}</div><div class="l">Authors in TP list</div></div>
+  <div class="card"><div class="n">{{ custom.other_authors }}</div><div class="l">Other authors</div></div>
+  <div class="card"><div class="n">{% if custom.rating_avg %}{{ custom.rating_avg|floatformat:2 }}{% else %}—{% endif %}</div><div class="l">Avg rating (n={{ custom.rating_n }})</div></div>
+</div>
+<div class="grid2">
+  <div>
+    <h3>Created via</h3>
+    <table>
+      {% for row in custom.created_via %}
+      <tr><td>{{ row.created_via|default:"—" }}</td><td>{{ row.n }}</td></tr>
+      {% empty %}<tr><td colspan="2">No data</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div>
+    <h3>Labor hours by owner</h3>
+    <table>
+      <tr><th>Owner</th><th>Hours</th><th>Entries</th></tr>
+      {% for row in custom.hours_by_owner %}
+      <tr>
+        <td>{{ row.owner_name }}</td>
+        <td>{% widthratio row.minutes 60 1 %}</td>
+        <td>{{ row.n }}</td>
+      </tr>
+      {% empty %}<tr><td colspan="3">No time entries</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

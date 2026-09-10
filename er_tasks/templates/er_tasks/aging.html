@@ -1,0 +1,51 @@
+{% extends "er_tasks/base.html" %}
+{% block title %}Aging{% endblock %}
+{% block content %}
+<div class="cards">
+  <div class="card"><div class="n">{{ aging.open_count }}</div><div class="l">Open tasks</div></div>
+</div>
+<div class="chart"><canvas id="age"></canvas></div>
+<div class="grid2">
+  <div>
+    <h3>By status</h3>
+    <table>
+      {% for status, n in aging.by_status.items %}
+      <tr><td>{{ status }}</td><td>{{ n }}</td></tr>
+      {% empty %}<tr><td colspan="2">No open tasks</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div>
+    <h3>By assignee</h3>
+    <table>
+      <tr><th>Assignee</th>{% for label in aging.buckets.keys %}<th>{{ label }}</th>{% endfor %}</tr>
+      {% for name, buckets in aging.by_assignee.items %}
+      <tr>
+        <td>{{ name }}</td>
+        {% for label, n in buckets.items %}<td>{{ n }}</td>{% endfor %}
+      </tr>
+      {% empty %}<tr><td colspan="6">No open tasks</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+<table style="margin-top:1.5rem">
+  <tr><th>Code</th><th>Name</th><th>Status</th><th>Assignee</th><th>Created</th></tr>
+  {% for t in aging.open_tasks %}
+  <tr>
+    <td><a href="{{ t.url }}" target="_blank" rel="noopener">{{ t.code }}</a></td>
+    <td>{{ t.name }}</td>
+    <td>{{ t.status }}</td>
+    <td>{{ t.responsible_name }}</td>
+    <td>{{ t.created_at }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<script>
+const buckets = {{ buckets_json|safe }};
+new Chart(document.getElementById('age'), {
+  type: 'bar',
+  data: { labels: buckets.map(b => b.x), datasets: [{ label: 'Open', data: buckets.map(b => b.y), backgroundColor: '#3d8bfd' }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { ticks: { color: '#8aa0b8' } }, y: { ticks: { color: '#8aa0b8' }, beginAtZero: true } } }
+});
+</script>
+{% endblock %}

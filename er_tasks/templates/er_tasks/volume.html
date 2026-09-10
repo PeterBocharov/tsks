@@ -1,0 +1,28 @@
+{% extends "er_tasks/base.html" %}
+{% block title %}Volume{% endblock %}
+{% block content %}
+<div class="cards">
+  <div class="card"><div class="n">{{ volume.total }}</div><div class="l">Tasks in filter</div></div>
+  <div class="card"><div class="n">{{ volume.open_count }}</div><div class="l">Open / backlog</div></div>
+</div>
+<div class="chart"><canvas id="vol"></canvas></div>
+<script>
+const created = {{ created_json|safe }};
+const closed = {{ closed_json|safe }};
+const labels = [...new Set([...created, ...closed].map(p => p.x))].sort();
+const cMap = Object.fromEntries(created.map(p => [p.x, p.y]));
+const dMap = Object.fromEntries(closed.map(p => [p.x, p.y]));
+new Chart(document.getElementById('vol'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Created', data: labels.map(l => cMap[l] || 0), borderColor: '#3d8bfd', tension: .2 },
+      { label: 'Closed', data: labels.map(l => dMap[l] || 0), borderColor: '#3dd68c', tension: .2 },
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#e8eef5' } } },
+    scales: { x: { ticks: { color: '#8aa0b8' } }, y: { ticks: { color: '#8aa0b8' }, beginAtZero: true } } }
+});
+</script>
+{% endblock %}
